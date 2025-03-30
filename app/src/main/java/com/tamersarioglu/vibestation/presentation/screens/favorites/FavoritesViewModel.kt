@@ -1,10 +1,10 @@
-package com.tamersarioglu.vibestation.presentaion.screens.favorites
+package com.tamersarioglu.vibestation.presentation.screens.favorites
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.tamersarioglu.vibestation.domain.model.RadioStation
 import com.tamersarioglu.vibestation.domain.repository.FavoritesRepository
-import com.tamersarioglu.vibestation.presentaion.common.UiState
+import com.tamersarioglu.vibestation.presentation.common.UiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

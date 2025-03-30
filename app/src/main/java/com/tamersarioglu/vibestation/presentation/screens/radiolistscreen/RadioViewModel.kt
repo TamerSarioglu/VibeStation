@@ -1,12 +1,11 @@
-package com.tamersarioglu.vibestation.presentaion.screens.radiolistscreen
+package com.tamersarioglu.vibestation.presentation.screens.radiolistscreen
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.tamersarioglu.vibestation.domain.model.RadioStation
 import com.tamersarioglu.vibestation.domain.repository.FavoritesRepository
-import com.tamersarioglu.vibestation.domain.repository.RadioRepository
 import com.tamersarioglu.vibestation.domain.usecase.GetRadioStationsUseCase
-import com.tamersarioglu.vibestation.presentaion.common.UiState
+import com.tamersarioglu.vibestation.presentation.common.UiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -58,11 +57,15 @@ class RadioViewModel @Inject constructor(
 
     fun toggleFavorite(station: RadioStation) {
         viewModelScope.launch {
-            if (_favoriteStations.value.contains(station.id)) {
+            val currentFavorites = _favoriteStations.value.toMutableSet()
+            if (currentFavorites.contains(station.id)) {
+                currentFavorites.remove(station.id)
                 favoritesRepository.removeFromFavorites(station)
             } else {
+                currentFavorites.add(station.id)
                 favoritesRepository.addToFavorites(station)
             }
+            _favoriteStations.value = currentFavorites
         }
     }
 

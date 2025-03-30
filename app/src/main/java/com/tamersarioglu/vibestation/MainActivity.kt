@@ -9,8 +9,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.rememberNavController
-import com.tamersarioglu.vibestation.presentaion.components.BottomNavigation
-import com.tamersarioglu.vibestation.presentaion.navigation.NavGraph
+import com.tamersarioglu.vibestation.presentation.components.BottomNavigation
+import com.tamersarioglu.vibestation.presentation.navigation.NavGraph
 import com.tamersarioglu.vibestation.ui.theme.VibeStationTheme
 import dagger.hilt.android.AndroidEntryPoint
 

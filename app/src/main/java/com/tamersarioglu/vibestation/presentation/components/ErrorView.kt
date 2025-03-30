@@ -1,4 +1,4 @@
-package com.tamersarioglu.vibestation.presentaion.components
+package com.tamersarioglu.vibestation.presentation.components
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column

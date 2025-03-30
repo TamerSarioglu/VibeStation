@@ -1,9 +1,8 @@
-package com.tamersarioglu.vibestation.presentaion.components
+package com.tamersarioglu.vibestation.presentation.components
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Icon
@@ -14,21 +13,19 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
-import com.tamersarioglu.vibestation.presentaion.navigation.Screen
+import com.tamersarioglu.vibestation.presentation.navigation.Screen
 
 @Composable
 fun BottomNavigation(navController: NavController) {
     val items = listOf(
         Screen.RadioList,
         Screen.Favorites,
-        Screen.Search,
         Screen.Settings
     )
 
     val icons = mapOf(
         Screen.RadioList to Icons.AutoMirrored.Filled.List,
         Screen.Favorites to Icons.Default.Favorite,
-        Screen.Search to Icons.Default.Search,
         Screen.Settings to Icons.Default.Settings
     )
 

@@ -1,9 +1,10 @@
-package com.tamersarioglu.vibestation.presentaion.components
+package com.tamersarioglu.vibestation.presentation.components
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -17,10 +18,11 @@ import com.tamersarioglu.vibestation.domain.model.RadioStation
 
 @Composable
 fun RadioItem(
+    modifier: Modifier = Modifier,
     station: RadioStation,
     onStationClick: () -> Unit,
     onFavoriteClick: () -> Unit,
-    modifier: Modifier = Modifier
+    isFavorite: Boolean = false,
 ) {
     Card(
         onClick = onStationClick,
@@ -61,9 +63,9 @@ fun RadioItem(
 
             IconButton(onClick = onFavoriteClick) {
                 Icon(
-                    imageVector = Icons.Default.Favorite,
-                    contentDescription = "Remove from favorites",
-                    tint = MaterialTheme.colorScheme.primary
+                    imageVector = if (isFavorite) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
+                    contentDescription = if (isFavorite) "Remove from favorites" else "Add to favorites",
+                    tint = if (isFavorite) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
         }
@@ -83,6 +85,7 @@ fun RadioItemPreview() {
             bitrate = 128
         ),
         onStationClick = {},
-        onFavoriteClick = {}
+        onFavoriteClick = {},
+        isFavorite = false
     )
 }

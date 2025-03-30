@@ -1,4 +1,4 @@
-package com.tamersarioglu.vibestation.presentaion.screens.radiolistscreen
+package com.tamersarioglu.vibestation.presentation.screens.radiolistscreen
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -22,12 +22,12 @@ import androidx.media3.exoplayer.ExoPlayer
 import androidx.navigation.NavController
 import com.tamersarioglu.vibestation.Utils.createExoPlayer
 import com.tamersarioglu.vibestation.domain.model.RadioStation
-import com.tamersarioglu.vibestation.presentaion.common.UiState
-import com.tamersarioglu.vibestation.presentaion.components.EmptyStateView
-import com.tamersarioglu.vibestation.presentaion.components.ErrorView
-import com.tamersarioglu.vibestation.presentaion.components.LoadingIndicator
-import com.tamersarioglu.vibestation.presentaion.components.PlayingSectionModalSheet
-import com.tamersarioglu.vibestation.presentaion.components.RadioItem
+import com.tamersarioglu.vibestation.presentation.common.UiState
+import com.tamersarioglu.vibestation.presentation.components.EmptyStateView
+import com.tamersarioglu.vibestation.presentation.components.ErrorView
+import com.tamersarioglu.vibestation.presentation.components.LoadingIndicator
+import com.tamersarioglu.vibestation.presentation.components.PlayingSectionModalSheet
+import com.tamersarioglu.vibestation.presentation.components.RadioItem
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -36,6 +36,7 @@ fun RadioListScreen(
     navController: NavController
 ) {
     val stationsState = viewModel.stations.collectAsState()
+    val favoriteStations = viewModel.favoriteStations.collectAsState()
     var playingStation by remember { mutableStateOf<RadioStation?>(null) }
     val skipPartiallyExpanded by rememberSaveable { mutableStateOf(false) }
     val bottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = skipPartiallyExpanded)
@@ -82,7 +83,8 @@ fun RadioListScreen(
                         RadioItem(
                             station = station,
                             onStationClick = { playingStation = station },
-                            onFavoriteClick = { viewModel.toggleFavorite(station) }
+                            onFavoriteClick = { viewModel.toggleFavorite(station) },
+                            isFavorite = favoriteStations.value.contains(station.id)
                         )
                     }
                 }
