@@ -10,10 +10,10 @@ import com.tamersarioglu.vibestation.presentaion.screens.search.SearchScreen
 import com.tamersarioglu.vibestation.presentaion.screens.settings.SettingsScreen
 
 sealed class Screen(val route: String) {
-    object RadioList : Screen("radio_list")
-    object Favorites : Screen("favorites")
-    object Search : Screen("search")
-    object Settings : Screen("settings")
+    data object RadioList : Screen("radio_list")
+    data object Favorites : Screen("favorites")
+    data object Search : Screen("search")
+    data object Settings : Screen("settings")
 }
 
 @Composable

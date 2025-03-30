@@ -17,7 +17,7 @@ object NetworkModule {
     @Singleton
     fun provideRetrofit(): Retrofit {
         return Retrofit.Builder()
-            .baseUrl("https://de1.api.radio-browser.info/json/")
+            .baseUrl("https://de2.api.radio-browser.info/json/")
             .addConverterFactory(GsonConverterFactory.create())
             .build()
     }
