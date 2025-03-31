@@ -1,10 +1,18 @@
 package com.tamersarioglu.vibestation.presentation.screens.radiolistscreen
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -17,6 +25,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.navigation.NavController
@@ -35,8 +44,9 @@ fun RadioListScreen(
     viewModel: RadioViewModel = hiltViewModel(),
     navController: NavController
 ) {
-    val stationsState = viewModel.stations.collectAsState()
+    val stationsState = viewModel.filteredStations.collectAsState()
     val favoriteStations = viewModel.favoriteStations.collectAsState()
+    val searchQuery = viewModel.searchQuery.collectAsState()
     var playingStation by remember { mutableStateOf<RadioStation?>(null) }
     val skipPartiallyExpanded by rememberSaveable { mutableStateOf(false) }
     val bottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = skipPartiallyExpanded)
@@ -72,33 +82,46 @@ fun RadioListScreen(
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
-        when (stationsState.value) {
-            is UiState.Loading -> {
-                LoadingIndicator()
-            }
-            is UiState.Success -> {
-                val stations = (stationsState.value as UiState.Success<List<RadioStation>>).data
-                LazyColumn(modifier = Modifier.fillMaxSize()) {
-                    items(stations) { station ->
-                        RadioItem(
-                            station = station,
-                            onStationClick = { playingStation = station },
-                            onFavoriteClick = { viewModel.toggleFavorite(station) },
-                            isFavorite = favoriteStations.value.contains(station.id)
-                        )
+        Column(modifier = Modifier.fillMaxSize()) {
+            OutlinedTextField(
+                value = searchQuery.value,
+                onValueChange = viewModel::onSearchQueryChange,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                placeholder = { Text("Search radio stations...") },
+                leadingIcon = { Icon(Icons.Default.Search, contentDescription = "Search") },
+                singleLine = true
+            )
+
+            when (stationsState.value) {
+                is UiState.Loading -> {
+                    LoadingIndicator()
+                }
+                is UiState.Success -> {
+                    val stations = (stationsState.value as UiState.Success<List<RadioStation>>).data
+                    LazyColumn(modifier = Modifier.fillMaxSize()) {
+                        items(stations) { station ->
+                            RadioItem(
+                                station = station,
+                                onStationClick = { playingStation = station },
+                                onFavoriteClick = { viewModel.toggleFavorite(station) },
+                                isFavorite = favoriteStations.value.contains(station.id)
+                            )
+                        }
                     }
                 }
-            }
-            is UiState.Error -> {
-                ErrorView(
-                    message = (stationsState.value as UiState.Error).message,
-                    onRetry = viewModel::refreshStations
-                )
-            }
-            is UiState.Empty -> {
-                EmptyStateView(
-                    message = "No radio stations available"
-                )
+                is UiState.Error -> {
+                    ErrorView(
+                        message = (stationsState.value as UiState.Error).message,
+                        onRetry = viewModel::refreshStations
+                    )
+                }
+                is UiState.Empty -> {
+                    EmptyStateView(
+                        message = if (searchQuery.value.isBlank()) "No radio stations available" else "No stations found matching your search"
+                    )
+                }
             }
         }
 
