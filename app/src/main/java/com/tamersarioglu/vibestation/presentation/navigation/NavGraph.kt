@@ -7,8 +7,10 @@ import androidx.navigation.compose.composable
 import com.tamersarioglu.vibestation.presentation.screens.radiolistscreen.RadioListScreen
 import com.tamersarioglu.vibestation.presentation.screens.favorites.FavoritesScreen
 import com.tamersarioglu.vibestation.presentation.screens.settings.SettingsScreen
+import com.tamersarioglu.vibestation.presentation.screens.splash.SplashScreen
 
 sealed class Screen(val route: String) {
+    data object Splash : Screen("splash")
     data object RadioList : Screen("radio_list")
     data object Favorites : Screen("favorites")
     data object Settings : Screen("settings")
@@ -18,8 +20,11 @@ sealed class Screen(val route: String) {
 fun NavGraph(navController: NavHostController) {
     NavHost(
         navController = navController,
-        startDestination = Screen.RadioList.route
+        startDestination = Screen.Splash.route
     ) {
+        composable(Screen.Splash.route) {
+            SplashScreen(navController = navController)
+        }
         composable(Screen.RadioList.route) {
             RadioListScreen(navController = navController)
         }
@@ -30,4 +35,4 @@ fun NavGraph(navController: NavHostController) {
             SettingsScreen(navController = navController)
         }
     }
-} 
+}
