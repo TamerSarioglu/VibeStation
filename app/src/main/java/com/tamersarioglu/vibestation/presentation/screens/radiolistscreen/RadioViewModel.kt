@@ -3,8 +3,8 @@ package com.tamersarioglu.vibestation.presentation.screens.radiolistscreen
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.tamersarioglu.vibestation.domain.model.RadioStation
-import com.tamersarioglu.vibestation.domain.repository.FavoritesRepository
 import com.tamersarioglu.vibestation.domain.usecase.GetRadioStationsUseCase
+import com.tamersarioglu.vibestation.domain.usecase.ManageFavoritesUseCase
 import com.tamersarioglu.vibestation.presentation.common.UiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -16,7 +16,7 @@ import javax.inject.Inject
 @HiltViewModel
 class RadioViewModel @Inject constructor(
     private val getRadioStationsUseCase: GetRadioStationsUseCase,
-    private val favoritesRepository: FavoritesRepository
+    private val manageFavoritesUseCase: ManageFavoritesUseCase
 ) : ViewModel() {
 
     private val _stations = MutableStateFlow<UiState<List<RadioStation>>>(UiState.Loading)
@@ -57,7 +57,7 @@ class RadioViewModel @Inject constructor(
 
     private fun loadFavoriteStations() {
         viewModelScope.launch {
-            favoritesRepository.getFavorites().collect { stations ->
+            manageFavoritesUseCase.getFavorites().collect { stations ->
                 _favoriteStations.value = stations.map { it.id }.toSet()
             }
         }
@@ -68,10 +68,10 @@ class RadioViewModel @Inject constructor(
             val currentFavorites = _favoriteStations.value.toMutableSet()
             if (currentFavorites.contains(station.id)) {
                 currentFavorites.remove(station.id)
-                favoritesRepository.removeFromFavorites(station)
+                manageFavoritesUseCase.removeFromFavorites(station)
             } else {
                 currentFavorites.add(station.id)
-                favoritesRepository.addToFavorites(station)
+                manageFavoritesUseCase.addToFavorites(station)
             }
             _favoriteStations.value = currentFavorites
         }

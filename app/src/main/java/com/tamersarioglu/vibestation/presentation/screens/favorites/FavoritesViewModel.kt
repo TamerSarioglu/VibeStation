@@ -3,7 +3,7 @@ package com.tamersarioglu.vibestation.presentation.screens.favorites
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.tamersarioglu.vibestation.domain.model.RadioStation
-import com.tamersarioglu.vibestation.domain.repository.FavoritesRepository
+import com.tamersarioglu.vibestation.domain.usecase.ManageFavoritesUseCase
 import com.tamersarioglu.vibestation.presentation.common.UiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -14,7 +14,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class FavoritesViewModel @Inject constructor(
-    private val favoritesRepository: FavoritesRepository
+    private val manageFavoritesUseCase: ManageFavoritesUseCase
 ) : ViewModel() {
 
     private val _favorites = MutableStateFlow<UiState<List<RadioStation>>>(UiState.Loading)
@@ -27,7 +27,7 @@ class FavoritesViewModel @Inject constructor(
     fun loadFavorites() {
         viewModelScope.launch {
             try {
-                favoritesRepository.getFavorites().collect { stations ->
+                manageFavoritesUseCase.getFavorites().collect { stations ->
                     if (stations.isEmpty()) {
                         _favorites.value = UiState.Empty
                     } else {
@@ -42,7 +42,7 @@ class FavoritesViewModel @Inject constructor(
 
     fun removeFromFavorites(station: RadioStation) {
         viewModelScope.launch {
-            favoritesRepository.removeFromFavorites(station)
+            manageFavoritesUseCase.removeFromFavorites(station)
         }
     }
 } 
