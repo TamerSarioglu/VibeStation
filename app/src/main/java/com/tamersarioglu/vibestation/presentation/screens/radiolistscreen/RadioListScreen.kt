@@ -1,6 +1,5 @@
 package com.tamersarioglu.vibestation.presentation.screens.radiolistscreen
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -11,7 +10,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Text
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -24,19 +24,16 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.navigation.NavController
 import com.tamersarioglu.vibestation.Utils.createExoPlayer
 import com.tamersarioglu.vibestation.domain.model.RadioStation
 import com.tamersarioglu.vibestation.presentation.common.UiState
-import com.tamersarioglu.vibestation.presentation.components.BottomNavigation
 import com.tamersarioglu.vibestation.presentation.components.EmptyStateView
+import com.tamersarioglu.vibestation.presentation.components.EnhancedHeader
 import com.tamersarioglu.vibestation.presentation.components.ErrorView
 import com.tamersarioglu.vibestation.presentation.components.LoadingIndicator
 import com.tamersarioglu.vibestation.presentation.components.PlayingSectionModalSheet
@@ -87,67 +84,71 @@ fun RadioListScreen(
         }
     }
 
-    Box(modifier = Modifier.fillMaxSize()) {
+    Surface(
+        modifier = Modifier.fillMaxSize(),
+        color = MaterialTheme.colorScheme.background
+    ) {
         Column(modifier = Modifier.fillMaxSize()) {
-            // Header that matches the screenshot
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(Color(0xFF6200EE))
-                    .padding(start = 20.dp, top = 40.dp, bottom = 16.dp)
-            ) {
-                Text(
-                    text = "Radio Stations",
-                    color = Color.White,
-                    fontSize = 30.sp,
-                    fontWeight = FontWeight.Bold
-                )
-            }
-
-            // Search bar that matches the screenshot
-            StationSearchBar(
-                query = searchQuery.value,
-                onQueryChange = viewModel::onSearchQueryChange,
-                modifier = Modifier.padding(top = 8.dp, bottom = 8.dp)
+            // Enhanced Header
+            EnhancedHeader(
+                title = "Radio Stations",
+                subtitle = "Discover your favorite stations"
             )
 
-            // Main content
-            when (stationsState.value) {
-                is UiState.Loading -> {
-                    LoadingIndicator()
-                }
-                is UiState.Success -> {
-                    val stations = (stationsState.value as UiState.Success<List<RadioStation>>).data
-                    LazyColumn(
-                        modifier = Modifier.fillMaxSize(),
-                        state = listState,
-                        contentPadding = PaddingValues(bottom = 80.dp) // Space for bottom nav
-                    ) {
-                        items(
-                            items = stations,
-                            key = { it.id }
-                        ) { station ->
-                            RadioItem(
-                                station = station,
-                                onStationClick = { playingStation = station },
-                                onFavoriteClick = { viewModel.toggleFavorite(station) },
-                                isFavorite = favoriteStations.value.contains(station.id)
-                            )
+            // Search bar below header
+            StationSearchBar(
+                query = searchQuery.value,
+                onQueryChange = { viewModel.updateSearchQuery(it) },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp)
+                    .padding(top = 16.dp, bottom = 8.dp)
+            )
+
+            // Station List or Loading/Error states
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .weight(1f),
+                contentAlignment = Alignment.Center
+            ) {
+                when (stationsState.value) {
+                    is UiState.Loading -> {
+                        LoadingIndicator()
+                    }
+                    is UiState.Success -> {
+                        val stations = (stationsState.value as UiState.Success<List<RadioStation>>).data
+                        LazyColumn(
+                            modifier = Modifier.fillMaxSize(),
+                            state = listState,
+                            contentPadding = PaddingValues(bottom = 80.dp, top = 8.dp) // Space for bottom nav
+                        ) {
+                            items(
+                                items = stations,
+                                key = { it.id }
+                            ) { station ->
+                                RadioItem(
+                                    station = station,
+                                    onStationClick = { playingStation = station },
+                                    onFavoriteClick = { viewModel.toggleFavorite(station) },
+                                    isFavorite = favoriteStations.value.contains(station.id)
+                                )
+                            }
                         }
                     }
-                }
-                is UiState.Error -> {
-                    ErrorView(
-                        message = (stationsState.value as UiState.Error).message,
-                        onRetry = viewModel::refreshStations
-                    )
-                }
-                is UiState.Empty -> {
-                    EmptyStateView(
-                        message = if (searchQuery.value.isBlank())
-                            "No radio stations available"
-                        else "No stations found matching '${searchQuery.value}'"
-                    )
+                    is UiState.Error -> {
+                        ErrorView(
+                            message = (stationsState.value as UiState.Error).message,
+                            onRetry = viewModel::refreshStations
+                        )
+                    }
+                    is UiState.Empty -> {
+                        EmptyStateView(
+                            message = if (searchQuery.value.isBlank())
+                                "No radio stations available"
+                            else "No stations found matching '${searchQuery.value}'"
+                        )
+                    }
                 }
             }
         }

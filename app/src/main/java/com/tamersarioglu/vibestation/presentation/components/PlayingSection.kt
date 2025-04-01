@@ -40,16 +40,23 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.media3.exoplayer.ExoPlayer
 import coil.compose.AsyncImage
 import com.tamersarioglu.vibestation.domain.model.RadioStation
+import com.tamersarioglu.vibestation.ui.theme.Primary
+import com.tamersarioglu.vibestation.ui.theme.PrimaryDark
+import com.tamersarioglu.vibestation.ui.theme.PrimaryLight
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -96,7 +103,6 @@ private fun PlayingSheetContent(
 ) {
     var isPlaying by remember { mutableStateOf(true) }
 
-    // Create pulsating animation for the now playing indicator
     val infiniteTransition = rememberInfiniteTransition(label = "pulse")
     val scale by infiniteTransition.animateFloat(
         initialValue = 0.8f,
@@ -111,18 +117,16 @@ private fun PlayingSheetContent(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(start = 24.dp, end = 24.dp, bottom = 32.dp),
-        verticalArrangement = Arrangement.Center,
+            .padding(horizontal = 24.dp, vertical = 16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // Large station logo
+        // Station logo
         Box(
             modifier = Modifier
-                .padding(top = 16.dp, bottom = 24.dp)
                 .size(200.dp)
+                .shadow(8.dp, RoundedCornerShape(16.dp))
                 .clip(RoundedCornerShape(16.dp))
-                .background(MaterialTheme.colorScheme.surfaceVariant),
-            contentAlignment = Alignment.Center
+                .background(MaterialTheme.colorScheme.surfaceVariant)
         ) {
             AsyncImage(
                 model = station.favicon,
@@ -131,12 +135,11 @@ private fun PlayingSheetContent(
                 contentScale = ContentScale.Crop
             )
 
-            // Fallback icon if image fails to load
+            // Fallback icon
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(Color.Black.copy(alpha = 0.4f))
-                    .align(Alignment.Center)
+                    .background(Color.Black.copy(alpha = 0.2f))
             ) {
                 Icon(
                     imageVector = Icons.Default.MusicNote,
@@ -149,57 +152,63 @@ private fun PlayingSheetContent(
             }
         }
 
-        // Station name with larger text
+        Spacer(modifier = Modifier.height(24.dp))
+
+        // Station name
         Text(
             text = station.name,
-            style = MaterialTheme.typography.headlineMedium,
+            style = MaterialTheme.typography.headlineMedium.copy(
+                fontWeight = FontWeight.Bold
+            ),
             color = MaterialTheme.colorScheme.onSurface,
             textAlign = TextAlign.Center,
-            maxLines = 1,
+            maxLines = 2,
             overflow = TextOverflow.Ellipsis
         )
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        // Station tags and bitrate
+        // Station info
         Text(
-            text = if (station.tags.isNotEmpty()) "${station.tags} • ${station.bitrate}kbps" else "${station.bitrate}kbps",
+            text = if (station.tags.isNotEmpty()) 
+                "${station.tags} • ${station.bitrate}kbps" 
+            else "${station.bitrate}kbps",
             style = MaterialTheme.typography.bodyLarge,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center
         )
 
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(32.dp))
 
-        // Now playing indicator with animation
+        // Live indicator
         Row(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(8.dp),
-            horizontalArrangement = Arrangement.Center,
-            verticalAlignment = Alignment.CenterVertically
+                .clip(RoundedCornerShape(30.dp))
+                .background(Primary.copy(alpha = 0.1f))
+                .padding(horizontal = 16.dp, vertical = 8.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center
         ) {
-            // Pulsating circle indicator
             Box(
                 modifier = Modifier
                     .scale(scale)
-                    .size(12.dp)
+                    .size(8.dp)
                     .clip(CircleShape)
-                    .background(MaterialTheme.colorScheme.primary)
+                    .background(Primary)
             )
-
-            Spacer(modifier = Modifier.width(12.dp))
-
+            
+            Spacer(modifier = Modifier.width(8.dp))
+            
             Text(
                 text = "LIVE NOW",
                 style = MaterialTheme.typography.labelLarge,
-                color = MaterialTheme.colorScheme.primary
+                color = Primary
             )
         }
 
         Spacer(modifier = Modifier.height(32.dp))
 
-        // Controls row
+        // Controls
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceEvenly,
@@ -215,24 +224,28 @@ private fun PlayingSheetContent(
                     }
                     isPlaying = !isPlaying
                 },
-                modifier = Modifier.size(64.dp),
+                modifier = Modifier
+                    .size(64.dp)
+                    .shadow(4.dp, CircleShape),
                 shape = CircleShape,
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer
+                    containerColor = Primary
                 )
             ) {
                 Icon(
                     imageVector = if (isPlaying) Icons.Default.Pause else Icons.Default.PlayArrow,
                     contentDescription = if (isPlaying) "Pause" else "Play",
                     modifier = Modifier.size(32.dp),
-                    tint = MaterialTheme.colorScheme.onPrimaryContainer
+                    tint = Color.White
                 )
             }
 
             // Close button
             Button(
-                onClick = { onClose() },
-                modifier = Modifier.size(64.dp),
+                onClick = onClose,
+                modifier = Modifier
+                    .size(64.dp)
+                    .shadow(4.dp, CircleShape),
                 shape = CircleShape,
                 colors = ButtonDefaults.buttonColors(
                     containerColor = MaterialTheme.colorScheme.errorContainer
@@ -240,12 +253,13 @@ private fun PlayingSheetContent(
             ) {
                 Icon(
                     imageVector = Icons.Default.Close,
-                    contentDescription = "Stop and close",
+                    contentDescription = "Close",
                     modifier = Modifier.size(28.dp),
                     tint = MaterialTheme.colorScheme.onErrorContainer
                 )
             }
         }
-    }
-}
 
+        Spacer(modifier = Modifier.height(16.dp))
+    }
+} 

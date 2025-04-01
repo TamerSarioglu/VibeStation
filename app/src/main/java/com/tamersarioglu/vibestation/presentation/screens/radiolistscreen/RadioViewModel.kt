@@ -88,6 +88,9 @@ class RadioViewModel @Inject constructor(
             else -> _filteredStations.value = currentStations
         }
     }
+    
+    // Alias for onSearchQueryChange to be used in RadioListScreen
+    fun updateSearchQuery(query: String) = onSearchQueryChange(query)
 
     private fun filterStations(stations: List<RadioStation>, query: String) {
         if (query.isBlank()) {

@@ -55,9 +55,7 @@ fun SettingsScreen(navController: NavController) {
         // Enhanced header
         EnhancedHeader(
             title = "Settings",
-            searchQuery = "",
-            onSearchQueryChange = {},
-            showSearch = false
+            subtitle = "Customize your experience"
         )
 
         // Settings content
