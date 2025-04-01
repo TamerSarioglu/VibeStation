@@ -6,22 +6,28 @@ import com.tamersarioglu.vibestation.domain.repository.FavoritesRepository
 import com.tamersarioglu.vibestation.domain.repository.RadioRepository
 import dagger.Binds
 import dagger.Module
+import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-abstract class RepositoryModule {
-    @Binds
-    @Singleton
-    abstract fun bindRadioRepository(
-        repository: RadioRepositoryImpl
-    ): RadioRepository
+object RepositoryModule {
 
-    @Binds
+    @Provides
     @Singleton
-    abstract fun bindFavoritesRepository(
+    fun bindRadioRepository(
+        repository: RadioRepositoryImpl
+    ): RadioRepository {
+        return repository
+    }
+
+    @Provides
+    @Singleton
+    fun bindFavoritesRepository(
         repository: FavoritesRepositoryImpl
-    ): FavoritesRepository
+    ): FavoritesRepository{
+        return repository
+    }
 }
