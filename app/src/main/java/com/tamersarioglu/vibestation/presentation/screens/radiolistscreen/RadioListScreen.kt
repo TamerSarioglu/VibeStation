@@ -152,13 +152,6 @@ fun RadioListScreen(
             }
         }
 
-        // Bottom navigation that matches the screenshot
-        Box(
-            modifier = Modifier.align(Alignment.BottomCenter)
-        ) {
-            BottomNavigation(navController = navController)
-        }
-
         // Playing station bottom sheet
         playingStation?.let { station ->
             PlayingSectionModalSheet(
