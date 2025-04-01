@@ -39,6 +39,7 @@ import com.tamersarioglu.vibestation.presentation.components.LoadingIndicator
 import com.tamersarioglu.vibestation.presentation.components.PlayingSectionModalSheet
 import com.tamersarioglu.vibestation.presentation.components.RadioItem
 import com.tamersarioglu.vibestation.presentation.components.StationSearchBar
+import com.tamersarioglu.vibestation.utils.ExoPlayerHandler
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -54,6 +55,7 @@ fun RadioListScreen(
     val bottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = skipPartiallyExpanded)
     val context = LocalContext.current
     val listState = rememberLazyListState()
+    val exoPlayerHandler = remember { ExoPlayerHandler(context) }
 
     // Keep track of the ExoPlayer instance
     var exoPlayer by remember { mutableStateOf<ExoPlayer?>(null) }
@@ -161,7 +163,7 @@ fun RadioListScreen(
                     playingStation = null
                 },
                 sheetState = bottomSheetState,
-                exoPlayer = exoPlayer
+                exoPlayerHandler = exoPlayerHandler
             )
         }
     }

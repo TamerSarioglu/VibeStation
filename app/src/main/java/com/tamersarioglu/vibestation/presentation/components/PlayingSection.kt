@@ -34,29 +34,23 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.SheetState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.media3.exoplayer.ExoPlayer
 import coil.compose.AsyncImage
+import com.tamersarioglu.vibestation.utils.ExoPlayerHandler
 import com.tamersarioglu.vibestation.domain.model.RadioStation
 import com.tamersarioglu.vibestation.ui.theme.Primary
-import com.tamersarioglu.vibestation.ui.theme.PrimaryDark
-import com.tamersarioglu.vibestation.ui.theme.PrimaryLight
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -64,7 +58,7 @@ fun PlayingSectionModalSheet(
     station: RadioStation,
     onClose: () -> Unit,
     sheetState: SheetState,
-    exoPlayer: ExoPlayer?
+    exoPlayerHandler: ExoPlayerHandler
 ) {
     ModalBottomSheet(
         sheetState = sheetState,
@@ -87,10 +81,10 @@ fun PlayingSectionModalSheet(
         PlayingSheetContent(
             station = station,
             onClose = {
-                exoPlayer?.stop()
+                exoPlayerHandler.stopStation()
                 onClose()
             },
-            exoPlayer = exoPlayer
+            exoPlayerHandler = exoPlayerHandler
         )
     }
 }
@@ -99,9 +93,9 @@ fun PlayingSectionModalSheet(
 private fun PlayingSheetContent(
     station: RadioStation,
     onClose: () -> Unit,
-    exoPlayer: ExoPlayer?
+    exoPlayerHandler: ExoPlayerHandler
 ) {
-    var isPlaying by remember { mutableStateOf(true) }
+    val isPlaying by exoPlayerHandler.isPlaying.collectAsState()
 
     val infiniteTransition = rememberInfiniteTransition(label = "pulse")
     val scale by infiniteTransition.animateFloat(
@@ -216,14 +210,7 @@ private fun PlayingSheetContent(
         ) {
             // Play/Pause button
             Button(
-                onClick = {
-                    if (isPlaying) {
-                        exoPlayer?.pause()
-                    } else {
-                        exoPlayer?.play()
-                    }
-                    isPlaying = !isPlaying
-                },
+                onClick = { exoPlayerHandler.togglePlayPause() },
                 modifier = Modifier
                     .size(64.dp)
                     .shadow(4.dp, CircleShape),

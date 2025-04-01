@@ -1,5 +1,6 @@
 package com.tamersarioglu.vibestation.presentation.screens.favorites
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.tamersarioglu.vibestation.domain.model.RadioStation
@@ -52,8 +53,6 @@ class FavoritesViewModel @Inject constructor(
     fun removeFromFavorites(station: RadioStation) {
         viewModelScope.launch {
             manageFavoritesUseCase.removeFromFavorites(station)
-            // No need to reload here as the Flow from the repository will emit new data
-            // which will be handled by the existing collection in loadFavorites
         }
     }
 } 

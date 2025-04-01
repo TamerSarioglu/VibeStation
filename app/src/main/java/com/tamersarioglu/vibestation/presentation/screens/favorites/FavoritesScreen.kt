@@ -4,6 +4,8 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -25,9 +27,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.media3.exoplayer.ExoPlayer
 import androidx.navigation.NavController
-import com.tamersarioglu.vibestation.Utils.createExoPlayer
+import com.tamersarioglu.vibestation.utils.ExoPlayerHandler
 import com.tamersarioglu.vibestation.domain.model.RadioStation
 import com.tamersarioglu.vibestation.presentation.common.UiState
 import com.tamersarioglu.vibestation.presentation.components.EmptyStateView
@@ -46,40 +47,30 @@ fun FavoritesScreen(
     val favoritesState = viewModel.favorites.collectAsState()
     var playingStation by remember { mutableStateOf<RadioStation?>(null) }
     val skipPartiallyExpanded by rememberSaveable { mutableStateOf(false) }
-    val bottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = skipPartiallyExpanded)
+    val bottomSheetState =
+        rememberModalBottomSheetState(skipPartiallyExpanded = skipPartiallyExpanded)
     val context = LocalContext.current
     val listState = rememberLazyListState()
+    val exoPlayerHandler = remember { ExoPlayerHandler(context) }
 
-    // Load favorites only once when the screen is first composed
-    LaunchedEffect(key1 = Unit) {
+    // Load favorites when the screen is first displayed
+    LaunchedEffect(Unit) {
         viewModel.loadFavorites()
     }
 
-    // Keep track of the ExoPlayer instance
-    var exoPlayer by remember { mutableStateOf<ExoPlayer?>(null) }
-
-    // Clean up ExoPlayer when the composable is disposed
+    // Clean up when the composable is disposed
     DisposableEffect(Unit) {
         onDispose {
-            exoPlayer?.release()
+            exoPlayerHandler.stopStation()
         }
     }
 
     LaunchedEffect(playingStation) {
         if (playingStation != null) {
-            // Release previous player if it exists
-            exoPlayer?.release()
-            // Create and start new player
-            exoPlayer = createExoPlayer(context, playingStation!!.streamUrl).apply {
-                playWhenReady = true
-                play()
-            }
+            exoPlayerHandler.playStation(playingStation!!)
             bottomSheetState.show()
         } else {
-            // Stop and release player when no station is selected
-            exoPlayer?.stop()
-            exoPlayer?.release()
-            exoPlayer = null
+            exoPlayerHandler.stopStation()
             bottomSheetState.hide()
         }
     }
@@ -104,6 +95,7 @@ fun FavoritesScreen(
                     is UiState.Loading -> {
                         LoadingIndicator()
                     }
+
                     is UiState.Success -> {
                         val stations = state.data
                         LazyColumn(
@@ -124,12 +116,14 @@ fun FavoritesScreen(
                             }
                         }
                     }
+
                     is UiState.Error -> {
                         ErrorView(
                             message = state.message,
                             onRetry = viewModel::loadFavorites
                         )
                     }
+
                     is UiState.Empty -> {
                         EmptyStateView(
                             message = "Your favorites list is empty"
@@ -148,7 +142,7 @@ fun FavoritesScreen(
                 playingStation = null
             },
             sheetState = bottomSheetState,
-            exoPlayer = exoPlayer
+            exoPlayerHandler = exoPlayerHandler
         )
     }
 }
