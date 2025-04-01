@@ -54,7 +54,7 @@ import com.tamersarioglu.vibestation.ui.theme.Primary
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PlayingSectionModalSheet(
+fun PlayingSectionBottomSheet(
     station: RadioStation,
     onClose: () -> Unit,
     sheetState: SheetState,
